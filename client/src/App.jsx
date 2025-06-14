@@ -1,3 +1,5 @@
+import { Transition } from "@headlessui/react";
+import { IoClose } from "react-icons/io5";
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -6,9 +8,11 @@ import Users from "./pages/Users";
 import Trash from "./pages/Trash";
 import TaskDetails from "./pages/TaskDetails";
 import { Toaster } from "sonner";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar"
+import Navbar from "./components/Navbar";
+import { setOpenSidebar } from "./redux/slices/authSlice";
+import { Fragment, useRef } from "react";
 
 
 function Layout() {
@@ -23,7 +27,7 @@ function Layout() {
           <Sidebar /> 
       </div>
 
-       { /* <MobileSidebar />  */ }
+    <MobileSidebar />
 
       <div className='flex-1 overflow-y-auto'>
         <Navbar />
@@ -37,6 +41,55 @@ function Layout() {
     <Navigate to="/log-in" state={{ from: location }} replace />
   );
 }
+
+const MobileSidebar = () => {
+  const { isSidebarOpen } = useSelector((state) => state.auth);
+  const mobileMenuRef = useRef(null);
+  const dispatch = useDispatch();
+
+  const closeSidebar = () => {
+    dispatch(setOpenSidebar(false));
+  };
+
+  return (
+    <>
+      <Transition
+        show={isSidebarOpen}
+        as={Fragment}
+        enter='transition-opacity duration-700'
+        enterFrom='opacity-x-10'
+        enterTo='opacity-x-100'
+        leave='transition-opacity duration-700'
+        leaveFrom='opacity-x-100'
+        leaveTo='opacity-x-0'
+      >
+        {(ref) => (
+          <div
+            ref={(node) => (mobileMenuRef.current = node)}
+            className={`md:hidden w-full h-full bg-black/40 transition-transform duration-700 transform
+             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+            onClick={() => closeSidebar()}
+          >
+            <div className=' bg-white dark:bg-[#1f1f1f] w-3/4 h-full overflow-y-auto'>
+              <div className='w-full flex justify-end px-5 pt-5'>
+                <button
+                  onClick={() => closeSidebar()}
+                  className='flex justify-end items-end'
+                >
+                  <IoClose size={25} />
+                </button>
+              </div>
+
+              <div className='-mt-10'>
+                <Sidebar />
+              </div>
+            </div>
+          </div>
+        )}
+      </Transition>
+    </>
+  );
+};
 
 function App() {
   return (

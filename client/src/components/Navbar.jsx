@@ -2,6 +2,7 @@ import React from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import UserAvatar from "./UserAvatar";
+import { setOpenSidebar } from "../redux/slices/authSlice";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
